@@ -1,27 +1,9 @@
-package link_to_cloud;
+ï»¿package link_to_cloud;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
-/*
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.HttpURLConnection;  
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-
-import java.util.concurrent.locks.Lock;  
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import vnc.RemoteDataServer;
-*/
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -44,28 +26,33 @@ public class link_to_cloud {
 	private static String web_data = "";
 	private static HttpClient conn_cloud = null; 
 	private static Scanner scanner;
-	private static int json_index;
 	static JSONObject json_web_data;
 	
 	public link_to_cloud(String basic_web_link) 
 	{
-		conn_cloud = new DefaultHttpClient();			//ªì©l¤Æ¦¹function ªºhttp ³s±µ
+		conn_cloud = new DefaultHttpClient();			//åˆå§‹åŒ–æ­¤function çš„http é€£æ¥
 		
 		if (basic_web_link == null)
 			basic_web_link = "http://localhost:8080/meeting_cloud/device/";
-
+		basic_web_link = "http://localhost:8080/meeting_cloud/device/";
 		json_web_data = new JSONObject();
 		
 	}
-
-			//³z¹Lurl ºô§}³s¨ì¶³ºİ,¥u°µ³s±µ©M±µ¦¬¶³ºİ°e¨Óªºdata, ¤£·|¹ïdata °µ¥ô¦ó³B²z
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException
+	{
+		System.out.println(request("index.php").toString());
+	}
+			//é€éurl ç¶²å€é€£åˆ°é›²ç«¯,åªåšé€£æ¥å’Œæ¥æ”¶é›²ç«¯é€ä¾†çš„data, ä¸æœƒå°data åšä»»ä½•è™•ç†
 //==========================================================================================
 	
-	//³s¨ìurl, ¨Ã¨ú±o¸Óºô­¶ªº¸ê®Æ (http)
+	//é€£åˆ°url, ä¸¦å–å¾—è©²ç¶²é çš„è³‡æ–™ (http)
 	public static JSONObject request(String url) 
 			throws ClientProtocolException, IOException 
 	{
-		url = url + basic_web_link;
+		int json_index = 0;
+		basic_web_link = "http://localhost:8080/meeting_cloud/device/";
+		url = basic_web_link + url;
 	    HttpPost post = new HttpPost(url);
 	    HttpResponse res = conn_cloud.execute(post);
 	    post.abort();
@@ -82,23 +69,22 @@ public class link_to_cloud {
 	    String line = "";
 	    while ((line = br.readLine()) != null) 
 	    {   data = data + line + '\n';    }
-	    
-		json_index = web_data.indexOf('{');
+		json_index = data.indexOf('{');
 		json_web_data = new JSONObject(data.substring(json_index));
 	    
 	    return json_web_data;
 	  }
 	
 	
-	//¶ñ¼gºô­¶¤Wªºªí³æ¨Ã°e¥X¥h, °e¥X«á,ºô­¶·|¦Û°Ê¸õÂà¦Ü·sºô­¶, §â·sºô­¶ªººô§}§ì¤U¨Ó¨Ãreturn ¦^¥h
+	//å¡«å¯«ç¶²é ä¸Šçš„è¡¨å–®ä¸¦é€å‡ºå», é€å‡ºå¾Œ,ç¶²é æœƒè‡ªå‹•è·³è½‰è‡³æ–°ç¶²é , æŠŠæ–°ç¶²é çš„ç¶²å€æŠ“ä¸‹ä¾†ä¸¦return å›å»
 	public static JSONObject submit_form_post(Map<String, String> form_data, String url) 
 	throws ClientProtocolException, IOException
 	{
-		url = url + basic_web_link;
+		url = basic_web_link + url;
 	    HttpPost post = new HttpPost(url);
 	    
 	    ArrayList<NameValuePair> post_form = new ArrayList<NameValuePair>();
-	    for(Map.Entry<String, String> entry:form_data.entrySet())		//¥Îmap °O¿ıªí³æ©Ò¦³¸ê®Æ, ¨Ã§â©Ò¦³¸ê®Æ®³¥X¨Ó
+	    for(Map.Entry<String, String> entry:form_data.entrySet())		//ç”¨map è¨˜éŒ„è¡¨å–®æ‰€æœ‰è³‡æ–™, ä¸¦æŠŠæ‰€æœ‰è³‡æ–™æ‹¿å‡ºä¾†
 	    {   
 	    	if (entry.getKey() != "post_link")
 	    	post_form.add( new BasicNameValuePair( entry.getKey(), entry.getValue() ));	
@@ -108,7 +94,7 @@ public class link_to_cloud {
 	    HttpResponse res = conn_cloud.execute(post);
 	    BufferedReader br = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
 	    
-	    post.abort();//ÄÀ©ñpost ½Ğ¨D?
+	    post.abort();//é‡‹æ”¾post è«‹æ±‚?
 
 	    url = res.getLastHeader("Location").getValue();   
 	    
